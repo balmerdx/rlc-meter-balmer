@@ -96,8 +96,8 @@ int main(void)
 
   //mainOriginal();
   //mainPcd8544();
-  mainIli9341();
-  //main9958();
+  //mainIli9341();
+  main9958();
 }
 
 extern uint8_t SmallFont[];
@@ -117,17 +117,18 @@ void main9958()
   STM_EVAL_LEDInit(LED9);
   STM_EVAL_LEDInit(LED10);
 
-  STM_EVAL_LEDOn(LED3);
+  //STM_EVAL_LEDOn(LED3);
   AD9958_Init();
   STM_EVAL_LEDOn(LED4);
   Delay(5);
-
+/*
   if(AD9958_Test())
     STM_EVAL_LEDOn(LED5);
   else
     STM_EVAL_LEDOn(LED7);
-
-  AD9958_Set_Frequency(DDS_MAIN, 1000000);
+*/
+  AD9958_Set_Level(DDS_MAIN, 100);
+  AD9958_Set_Frequency(DDS_MAIN, 22000000);
   AD9958_Set_Frequency(DDS_LO, 1000000);
   while(1)
   {

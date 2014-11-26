@@ -1,41 +1,41 @@
 /**
-  ******************************************************************************
-  * @file    DRV/SARK110/ad9958_drv.c
-  * @author  Melchor Varela - EA4FRB
-  * @version V0.7.x
-  * @date    12-December-2012
-  * @brief   DDS AD9958 Driver
-  ******************************************************************************
-  * @copy
-  *
-  *  This file is a part of the "SARK110 Antenna Vector Impedance Analyzer" firmware
-  *
-  *  "SARK110 Antenna Vector Impedance Analyzer firmware" is free software: you can redistribute it
-  *  and/or modify it under the terms of the GNU General Public License as
-  *  published by the Free Software Foundation, either version 3 of the License,
-  *  or (at your option) any later version.
-  *
-  *  "SARK110 Antenna Vector Impedance Analyzer firmware" is distributed in the hope that it will be
-  *  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
-  *
-  *  You should have received a copy of the GNU General Public License
-  *  along with "SARK110 Antenna Vector Impedance Analyzer" firmware.  If not,
-  *  see <http://www.gnu.org/licenses/>.
-  *
-  * <h2><center>&copy; COPYRIGHT 2011-2013 Melchor Varela - EA4FRB </center></h2>
-  *  Melchor Varela, Madrid, Spain.
-  *  melchor.varela@gmail.com
-  */
+******************************************************************************
+* @file    DRV/SARK110/ad9958_drv.c
+* @author  Melchor Varela - EA4FRB
+* @version V0.7.x
+* @date    12-December-2012
+* @brief   DDS AD9958 Driver
+******************************************************************************
+* @copy
+*
+*  This file is a part of the "SARK110 Antenna Vector Impedance Analyzer" firmware
+*
+*  "SARK110 Antenna Vector Impedance Analyzer firmware" is free software: you can redistribute it
+*  and/or modify it under the terms of the GNU General Public License as
+*  published by the Free Software Foundation, either version 3 of the License,
+*  or (at your option) any later version.
+*
+*  "SARK110 Antenna Vector Impedance Analyzer firmware" is distributed in the hope that it will be
+*  useful,  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with "SARK110 Antenna Vector Impedance Analyzer" firmware.  If not,
+*  see <http://www.gnu.org/licenses/>.
+*
+* <h2><center>&copy; COPYRIGHT 2011-2013 Melchor Varela - EA4FRB </center></h2>
+*  Melchor Varela, Madrid, Spain.
+*  melchor.varela@gmail.com
+*/
 
 /** @defgroup DRV
-  * @{
-  */
+* @{
+*/
 
 /** @defgroup AD9958
-  * @{
-  */
+* @{
+*/
 
 
 /* Includes ------------------------------------------------------------------*/
@@ -47,13 +47,13 @@
 #include "stm32f30x_gpio.h"
 #include "stm32f30x_spi.h"
 
-
+#define DDS_POWER_DOWN_ENABLE
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
 /** @defgroup AD9958_Private_Variables
-  * @{
-  */
+* @{
+*/
 #define PLL_MUL					20.0				/* PLL multiplier */
 #define REFCLK					25000000.0			/* Reference clock: 25 MHz */
 #define MASTER_CLOCK			(REFCLK*PLL_MUL)	/* Master clock: 500 MHz */
@@ -62,11 +62,11 @@
 
 /* Private macro -------------------------------------------------------------*/
 /** @defgroup AD9958_Private_Macro
-  * @{
-  */
+* @{
+*/
 #ifdef DDS_POWER_DOWN_ENABLE
-#define DDS_PWR_DOWN_HIGH	(GPIOE->BSRR = GPIO_Pin_3)
-#define DDS_PWR_DOWN_LOW	(GPIOE->BRR = GPIO_Pin_3)
+#define DDS_PWR_DOWN_HIGH	(GPIOB->BSRR = GPIO_Pin_2)
+#define DDS_PWR_DOWN_LOW	(GPIOB->BRR = GPIO_Pin_2)
 #endif
 
 #define DDS_RESET_HIGH		(GPIOB->BSRR = GPIO_Pin_1)
@@ -79,10 +79,10 @@
 #define DDS_CS_LOW			(GPIOA->BRR = GPIO_Pin_4)
 
 
-    // CSR: 3-wire mode, MSB first, channels enabled
-//static uint8_t wire = 2;
-    // CSR: 2-wire mode, MSB first, channels enabled
-static uint8_t wire = 0;
+// CSR: 3-wire mode, MSB first, channels enabled
+static uint8_t wire = 2;
+// CSR: 2-wire mode, MSB first, channels enabled
+//static uint8_t wire = 0;
 
 /**
   * @}
@@ -119,29 +119,29 @@ static void IOUpdatePulse(void);
   */
 void AD9958_Init(void)
 {
-SPI_InitTypeDef   SPI_InitStructure;
+    SPI_InitTypeDef   SPI_InitStructure;
 
-  	/* System clocks configuration ---------------------------------------------*/
-	RCC_Configuration();
+    /* System clocks configuration ---------------------------------------------*/
+    RCC_Configuration();
 
   	/* GPIO configuration ------------------------------------------------------*/
-  	GPIO_Configuration();
+    GPIO_Configuration();
 /*
-  	// 1st phase: SPI1 Master 
-  	// SPI1 Config -------------------------------------------------------------
-  	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-  	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-  	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-  	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-  	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-  	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;//SPI_BaudRatePrescaler_4;
-  	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-  	SPI_InitStructure.SPI_CRCPolynomial = 7;
-  	SPI_Init(SPI1, &SPI_InitStructure);
+	// 1st phase: SPI1 Master 
+	// SPI1 Config -------------------------------------------------------------
+	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;//SPI_BaudRatePrescaler_4;
+	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStructure.SPI_CRCPolynomial = 7;
+	SPI_Init(SPI1, &SPI_InitStructure);
 
-  	// Enable SPI1
-  	SPI_Cmd(SPI1, ENABLE);
+	// Enable SPI1
+	SPI_Cmd(SPI1, ENABLE);
 */
   	/* DDS configuration -------------------------------------------------------
   	/* Resets DDS device */
@@ -161,13 +161,13 @@ SPI_InitTypeDef   SPI_InitStructure;
     WR_CSR(0xc0|wire);
 
 	/* FR1: PLL=20  */
- 	//WR_FR1(0xd0,0x00,0x00);
+ 	WR_FR1(0xd0,0x00,0x00);
 
     //PLL=20, Charge Pump=max
     //WR_FR1(0xd3,0x00,0x00);
 
-    //PLL=4, Charge Pump=max
-    WR_FR1(0x10,0x00,0x00);
+    //PLL=4, Charge Pump=default, <160 MHz
+    //WR_FR1(0x00,0x00,0x00);
 
  	/* Reset phase */
  	WR_CPOW0(0x00);
@@ -492,7 +492,7 @@ static void dds_send(uint8_t data)
     gpio.GPIO_Pin = GPIO_Pin_7;
     gpio.GPIO_Mode = GPIO_Mode_OUT;
     gpio.GPIO_OType = GPIO_OType_PP;
-    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    gpio.GPIO_Speed = GPIO_Speed_2MHz;
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOA, &gpio);
 
@@ -500,9 +500,11 @@ static void dds_send(uint8_t data)
         for(volatile int j=0; j<4; j++);
         GPIO_WriteBit(GPIOA, GPIO_Pin_7, (data & 0x80)? 1:0);
         data = data<<1;
-        for(volatile int j=0; j<32; j++);
+        //for(volatile int j=0; j<32; j++);
+        Delay(1);
         GPIO_WriteBit(GPIOA, GPIO_Pin_5, 1);
-        for(volatile int j=0; j<32; j++);
+        //for(volatile int j=0; j<32; j++);
+        Delay(1);
         GPIO_WriteBit(GPIOA, GPIO_Pin_5, 0);
     }
 }
@@ -514,7 +516,7 @@ static uint8_t dds_rcv()
     gpio.GPIO_Pin = GPIO_Pin_7;
     gpio.GPIO_Mode = GPIO_Mode_IN;
     gpio.GPIO_OType = GPIO_OType_PP;
-    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    gpio.GPIO_Speed = GPIO_Speed_2MHz;
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOA, &gpio);
 
@@ -562,14 +564,14 @@ static void GPIO_Configuration(void)
     gpio.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_7;
     gpio.GPIO_Mode = GPIO_Mode_OUT; //GPIO_Mode_IN
     gpio.GPIO_OType = GPIO_OType_PP;
-    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    gpio.GPIO_Speed = GPIO_Speed_2MHz;
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOA, &gpio);
 
     gpio.GPIO_Pin = GPIO_Pin_4;
     gpio.GPIO_Mode = GPIO_Mode_OUT;
     gpio.GPIO_OType = GPIO_OType_PP;
-    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    gpio.GPIO_Speed = GPIO_Speed_2MHz;
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOA, &gpio);
 
@@ -582,8 +584,8 @@ static void GPIO_Configuration(void)
 	GPIO_Init(GPIOB, &gpio);
 
 #ifdef DDS_POWER_DOWN_ENABLE
-    gpio.GPIO_Pin = GPIO_Pin_3;
-    GPIO_Init(GPIOE, &gpio);
+    gpio.GPIO_Pin = GPIO_Pin_2;
+    GPIO_Init(GPIOB, &gpio);
 #endif
 }
 
