@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 # balmer@inbox.ru 2014 RLC Meter
 import sys, os, csv
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 import threading
 
 import matplotlib

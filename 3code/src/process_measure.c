@@ -241,10 +241,19 @@ void OnInitWait()
 
 void OnResistorIndex()
 {
-	AdcSummaryChannel* asc = &g_data.ch_i;
-	int di = asc->adc_max - asc->adc_min;
-	if(di*10>goodDelta || resistorIdx>=3)
+	AdcSummaryChannel* chI = &g_data.ch_i;
+	AdcSummaryChannel* chV = &g_data.ch_v;
+	int dI = chI->adc_max - chI->adc_min;
+	int dV = chV->adc_max - chV->adc_min;
+	if(dI*10>goodDelta || resistorIdx>=3)
 	{
+		//Перезапускаем с самого начала выбор пределов, если ошиблись фатально
+		if(resistorIdx==3 && dV*10<goodDelta)
+		{
+			OnStartGainAuto();
+			return;
+		}
+
 		OnStartGainIndex();
 	} else
 	{
@@ -424,7 +433,7 @@ void OnMeasure()
 
 				if(vmax<goodMax && vmin>goodMin && imax<goodMax && imin>goodMin)
 				{
-					//Все хорошо, мтожно не пересчитывать коэффициэнты и не переставлять резистор
+					//Все хорошо, можно не пересчитывать коэффициэнты и не переставлять резистор
 					startFast = true;
 				}
 			}

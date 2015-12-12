@@ -26,7 +26,7 @@ C_DEFINES+= -std=c99
 
 #use 3 buttons to interface
 #comment this if use encoder
-#C_DEFINES+= -DDEF_INTERFACE_BUTTONS
+C_DEFINES+= -DDEF_INTERFACE_BUTTONS
 
 C_FLAGS+= -Wall -c -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -MMD $(C_INCLIDES) $(C_DEFINES) 
 #C_FLAGS+= -g -Wa,-adhls #asm listing
@@ -70,9 +70,9 @@ clean:
 	-@echo ' '
 
 flashd:
-	python /balmer/radio/stm32/tools/stm32_flash.py "${CURDIR}/$(TARGET)_debug.bin"
+	python /home/balmer/radio/stm32/tools/stm32_flash.py "${CURDIR}/$(TARGET)_debug.bin"
 
 flashr:
-	python /balmer/radio/stm32/tools/stm32_flash.py "${CURDIR}/$(TARGET)_release.bin"
+	python /home/balmer/radio/stm32/tools/stm32_flash.py "${CURDIR}/$(TARGET)_release.bin"
 
 .PHONY: all clean dependents

@@ -944,3 +944,13 @@ ESR KOm		0.800 		10.86 		349 		1.50 		1.20 		13.0        --- 		---
 	- калибровка с устройства
 		- особенность - open калибровку нужно проводить до 100 RJv калибровки
 	- схема от barby
+
+- new repository
+	https://github.com/balmerdx/rlc-meter-balmer
+
+	 пока работу отложим, так как нужен pyqt4 или mathplotlib для ptqt5
+
+- иногда плохо у rav133 переключается из open в short
+	OnResistorIndex
+
+- попробовать отключить внутренний буфер на выходе DAC
