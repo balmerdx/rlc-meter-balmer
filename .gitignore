@@ -1,0 +1,11 @@
+3code/linker.map
+3code/output/
+circuit/*.b#?
+circuit/*.s#?
+
+*.pyc
+
+.gitignore~
+*.py~
+*.txt~
+*.includes~
