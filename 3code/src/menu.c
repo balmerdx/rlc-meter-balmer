@@ -41,6 +41,15 @@ typedef enum MenuEnum {
 	MENU_CORRECTION_OPEN,
 	MENU_CORRECTION_SAVE,
 	MENU_CORRECTION_CLEAR,
+
+	MENU_ERRORS,
+	MENU_SET_R,
+	MENU_SET_R_AUTO,
+	MENU_SET_R0,
+	MENU_SET_R1,
+	MENU_SET_R2,
+	MENU_SET_R3,
+
 } MenuEnum;
 
 typedef struct MenuElem {
@@ -55,6 +64,8 @@ static MenuElem g_main_menu[]={
 	{"View", MENU_MAIN_VIEW_PARAM},
 	{"Toggle Light", MENU_MAIN_TOGGLE_LIGHT},
 	{"Correction", MENU_MAIN_CORRECTION},
+	{"Set R", MENU_SET_R},
+	{"Error%", MENU_ERRORS},
 };
 
 static MenuElem g_f_menu[]={
@@ -91,6 +102,16 @@ static MenuElem g_correction_menu[]={
 	{"CLEAR", MENU_CORRECTION_CLEAR},
 };
 
+static MenuElem g_set_r_menu[]={
+	{"..", MENU_RETURN},
+	{"auto", MENU_SET_R_AUTO},
+	{"R0 100 Om", MENU_SET_R0},
+	{"R1 1 KOm", MENU_SET_R1},
+	{"R2 10 KOm", MENU_SET_R2},
+	{"R3 100 KOm", MENU_SET_R3},
+	
+};
+
 static MenuElem* g_cur_menu = NULL;
 static uint8_t g_menu_size = 0;
 static uint8_t g_menu_pos = 0;
@@ -120,6 +141,7 @@ void MenuOnCommand(MenuEnum command);
 void MenuClearFlash();
 void MenuOnCorrection(MenuEnum command);
 void OnNumberEditEnd();
+void MenuSetR(uint8_t Ridx);
 
 void OnButtonPressed()
 {
@@ -265,6 +287,31 @@ void MenuOnCommand(MenuEnum command)
 	case MENU_CORRECTION_SAVE:
 	case MENU_CORRECTION_CLEAR:
 		MenuOnCorrection(command);
+		break;
+
+	case MENU_SET_R:
+		g_last_main_command = command;
+		MENU_START(g_set_r_menu);
+		break;
+	case MENU_SET_R_AUTO:
+		MenuSetR(255);
+		break;
+	case MENU_SET_R0:
+		MenuSetR(0);
+		break;
+	case MENU_SET_R1:
+		MenuSetR(1);
+		break;
+	case MENU_SET_R2:
+		MenuSetR(2);
+		break;
+	case MENU_SET_R3:
+		MenuSetR(3);
+		break;
+
+	case MENU_ERRORS:
+		printError = !printError;
+		MENU_CLEAR();
 		break;
 	}
 }
@@ -813,4 +860,13 @@ void OnNumberEditEnd()
 		MessageBox2("NumberEditEnd", "Bad command");	
 		break;
 	}
+}
+
+void MenuSetR(uint8_t Ridx)
+{
+	predefinedResistorIdx = Ridx;
+	gainVoltageIdx = 0;
+	gainCurrentIdx = 0;
+	g_update = true;
+	MENU_CLEAR();
 }

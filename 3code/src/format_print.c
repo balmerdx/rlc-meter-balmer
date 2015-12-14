@@ -4,6 +4,8 @@
 #include "pcd8544.h"
 char Buffer[32];
 
+LcdFontSize g_printX2size = FONT_2X;
+
 void addCommaToBuffer(uint8_t posComma)
 {
 	uint8_t size = 0;
@@ -203,7 +205,8 @@ void printL(float aValue, uint8_t font)
 	LcdStr(font, Buffer);	
 }
 
-void formatPrintX2(uint8_t y, char* aBuffer, float aValue, const char*const* aSuffix, uint8_t aSuffixCount, int8_t aSuffixMin)
+void formatPrintX2(uint8_t y, char* aBuffer, float aValue,
+	 const char*const* aSuffix, uint8_t aSuffixCount, int8_t aSuffixMin)
 {
 	char* startBuffer = aBuffer;
 	float mul = 1;
@@ -293,7 +296,7 @@ FormatValue:;
 AddSufix:;
 	*aBuffer = 0;
 	LcdGotoXYFont(2, y+1);
-	LcdStr(FONT_2X, startBuffer);
+	LcdStr(g_printX2size, startBuffer);
 
 	LcdGotoXYFont(12, y+1);
 	LcdStr(FONT_1X, aSuffix[iSuffix]);
@@ -312,4 +315,9 @@ void printLX2(float aValue, uint8_t y)
 void printCX2(float aValue, uint8_t y)
 {
 	formatPrintX2(y, Buffer, aValue, strCapacitor, sizeof(strCapacitor)/sizeof(strCapacitor[0]), -4);
+}
+
+void printX2size(LcdFontSize size)
+{
+	g_printX2size = size;
 }

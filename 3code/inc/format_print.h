@@ -14,6 +14,8 @@ void printT(float aValue);
 void printF(float aValue);
 void printL(float aValue, uint8_t font);
 
+
+void printX2size(LcdFontSize size);//Set FONT_1X or FONT_2X
 void printRX2(float aValue, uint8_t y);
 void printLX2(float aValue, uint8_t y);
 void printCX2(float aValue, uint8_t y);

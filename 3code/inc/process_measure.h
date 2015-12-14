@@ -29,6 +29,7 @@ void ProcessStartComputeX(
 STATES ProcessGetState();
 void SendRVI();
 
+extern uint8_t predefinedResistorIdx;
 extern uint8_t resistorIdx;
 extern uint8_t gainVoltageIdx;
 extern uint8_t gainCurrentIdx;

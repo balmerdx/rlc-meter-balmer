@@ -13,6 +13,7 @@
 
 int printD = 0; //debug
 float printGradus = -1000;
+bool printError = false;
 
 float Rre = 0;
 float Rim = 0;
@@ -68,6 +69,12 @@ void printLcdGradus()
     }
 }
 
+float errorRelative(AdcSummaryChannel* ch)
+{
+    float k = sqrtf(ch->k_sin*ch->k_sin+ch->k_cos*ch->k_cos);
+    return ch->square_error / k;
+}
+
 void LcdRepaint()
 {
     LcdClear();
@@ -85,30 +92,59 @@ void LcdRepaint()
     LcdStr(FONT_1X, isSerial?"SER":"PAR");
 
 
+    printX2size(printError?FONT_1X:FONT_2X);
+
     if(calculatedValues)
     {
         printRX2(Rre, 2);
-        LcdGotoXYFont(12,2);
-        LcdStr(FONT_1X, "Rre");
+
+        if(!printError)
+        {
+            LcdGotoXYFont(12,2);
+            LcdStr(FONT_1X, "Rre");
+        }
         
         if(printRim)
         {
             printRX2(Rim, 4);
-            LcdGotoXYFont(12,4);
-            LcdStr(FONT_1X, "Rim");
+            if(!printError)
+            {
+                LcdGotoXYFont(12,4);
+                LcdStr(FONT_1X, "Rim");
+            }
         } else
         {
             if(valueIsC)
             {
                 printCX2(valueC, 4);
-                LcdGotoXYFont(12,4);
-                LcdStr(FONT_1X, "C");
+                if(!printError)
+                {
+                    LcdGotoXYFont(12,4);
+                    LcdStr(FONT_1X, "C");
+                }
             } else
             {
                 printLX2(valueL, 4);
-                LcdGotoXYFont(12,4);
-                LcdStr(FONT_1X, "L");
+                if(!printError)
+                {
+                    LcdGotoXYFont(12,4);
+                    LcdStr(FONT_1X, "L");
+                }
             }
+        }
+
+        if(printError)
+        {
+            LcdGotoXYFont(1, 2);
+            LcdStr(FONT_1X, "I%");
+            LcdGotoXYFont(4, 2);
+            printIntFixed(round(errorRelative(&g_data.ch_i)*1000), FONT_1X, 3, 2);
+            //printIntFixed(1234, FONT_1X, 2, 2);
+
+            LcdGotoXYFont(1, 4);
+            LcdStr(FONT_1X, "V%");
+            LcdGotoXYFont(4, 4);
+            printIntFixed(round(errorRelative(&g_data.ch_v)*1000), FONT_1X, 3, 2);
         }
     }
 

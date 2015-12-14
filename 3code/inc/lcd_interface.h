@@ -19,3 +19,5 @@ extern bool valueIsC;
 extern bool calculatedValues;
 extern float valueL;
 extern float valueC;
+
+extern bool printError;

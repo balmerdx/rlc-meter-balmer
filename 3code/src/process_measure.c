@@ -247,14 +247,6 @@ void OnResistorIndex()
 	int dV = chV->adc_max - chV->adc_min;
 	if(dI*10>goodDelta || resistorIdx>=3)
 	{
-/*		
-		//Перезапускаем с самого начала выбор пределов, если ошиблись фатально
-		if(resistorIdx==3 && dV*10<goodDelta)
-		{
-			OnStartGainAuto();
-			return;
-		}
-*/
 		OnStartGainIndex();
 	} else
 	{
