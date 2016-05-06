@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.0">
+<eagle version="7.4.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -10479,10 +10479,18 @@ Source: 008-0260-0_E.pdf</description>
 <label x="91.44" y="-58.42" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$13" class="0">
+<net name="LIGHT" class="0">
 <segment>
 <pinref part="DISPLAY" gate="-7" pin="1"/>
 <wire x1="175.26" y1="-58.42" x2="165.1" y2="-58.42" width="0.1524" layer="91"/>
+<label x="162.56" y="-58.42" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$10" pin="PE1"/>
+<wire x1="12.7" y1="-50.8" x2="7.62" y2="-50.8" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="-50.8" x2="7.62" y2="-53.34" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="-53.34" x2="-5.08" y2="-53.34" width="0.1524" layer="91"/>
+<label x="-5.08" y="-53.34" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$6" class="0">
