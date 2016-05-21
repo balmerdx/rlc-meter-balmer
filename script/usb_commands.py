@@ -76,18 +76,19 @@ def findDevice():
     dev = usb.core.find(idVendor=0x16C0, idProduct=0x05DC)
 
     if dev is None:
-    	print 'Device not found'
+        print('Device not found')
         return False
     else:
-        print 'Device found'
+        print('Device found')
 
     dev.set_configuration()
     return True
 
 def dwrite(data):
-    return dev.write(1, data, interface=0)
+    return dev.write(1, data)#, interface=0)
 def dread():
-    d = dev.read(129, 128, interface=0, timeout=50)
+    #d = dev.read(129, 128, interface=0, timeout=50)
+    d = dev.read(129, 128, timeout=300)
     return d
 
 def readAll():
@@ -97,8 +98,8 @@ def readAll():
             data = dread()
             if len(data)==0:
                 break
-            print "readb=", data
-            print "read=", data.tostring()
+            print("readb=", data)
+            print("read=", data.tostring())
         except usb.core.USBError:
             break
     pass
@@ -108,21 +109,21 @@ def readOne():
     try:
         data = dread()
         if len(data)==0:
-            print "Read empty"
+            print("Read empty")
         else:
             #print "readb=", data
             #print "read=", data.tostring()
             pass
     except usb.core.USBError:
-        print "Read USB error"
+        print("Read USB error")
     pass
 
 def readInt():
     data = dread()
     if len(data)!=4:
-        print "Fail read int len="+str(len(data))
+        print("Fail read int len="+str(len(data)))
     else:
-        print data[0]+data[1]*0x100+data[2]*0x10000+data[3]*0x1000000
+        print(data[0]+data[1]*0x100+data[2]*0x10000+data[3]*0x1000000)
 
 def readCommand():
     global ncycle, period, clock
@@ -130,45 +131,45 @@ def readCommand():
     try:
         data = dread()
         if len(data)==0:
-            print "Read empty"
+            print("Read empty")
             return
         else:
             #print "readb=", data
             pass
     except usb.core.USBError:
-        print "Read USB error"
+        print("Read USB error")
         return
 
     cmd = data[0]
     if cmd==COMMAND_SET_LED:
-        print "Set led="+str(data[1]) 
+        print("Set led="+str(data[1])) 
     elif cmd==COMMAND_SET_FREQUENCY:
         period = struct.unpack_from('I', data, 1)[0]
         clock = struct.unpack_from('I', data, 5)[0]
-        print "period=",period
-        print "clock=",clock
-        print "F=",clock/float(period)
+        print("period=",period)
+        print("clock=",clock)
+        print("F=",clock/float(period))
     elif cmd==COMMAND_SET_GAIN:
         #print "set gain"
         pass
     elif cmd==COMMAND_ADC_ELAPSED_TIME:
-        print "Elapset ticks=", struct.unpack_from('I', data, 1)[0]
+        print("Elapset ticks=", struct.unpack_from('I', data, 1)[0])
     elif cmd==COMMAND_START_SYNCHRO:
         (period, clock, ncycle) = struct.unpack_from('=III', data, 1)
-        print "period=",period
-        print "clock=",clock
-        print "F=",clock/float(period)
-        print "ncycle=", ncycle
+        print("period=",period)
+        print("clock=",clock)
+        print("F=",clock/float(period))
+        print("ncycle=", ncycle)
     elif cmd==COMMAND_SET_RESISTOR:
         r = data[1]
         if r==0:
-            print "r=100 Om"
+            print("r=100 Om")
         elif r==1:
-            print "r=1 KOm"
+            print("r=1 KOm")
         elif r==2:
-            print "r=10 KOm"
+            print("r=10 KOm")
         elif r==3:
-            print "r=100 KOm"
+            print("r=100 KOm")
     elif cmd==COMMAND_LAST_COMPUTE:
         pass
     elif cmd==COMMAND_SET_LOW_PASS:
@@ -176,11 +177,11 @@ def readCommand():
     elif cmd==COMMAND_START_GAIN_AUTO:
         pass
     else:
-        print "Unknown command="+str(data[0])
+        print("Unknown command="+str(data[0]))
     pass
 
 def setFreq(F):
-    print "write=",dwrite(struct.pack("=BI", COMMAND_SET_FREQUENCY, F))
+    print("write=",dwrite(struct.pack("=BI", COMMAND_SET_FREQUENCY, F)))
     readCommand()
     pass
 
@@ -231,7 +232,7 @@ def adcReadRVI():
     data = dread()
     assert(data[0]==COMMAND_RVI_INDEXES)
     (resistorIdx, gainVoltageIdx, gainCurrentIdx) = struct.unpack_from('=BBB', data, 1)
-    print "V="+str(gainVoltageIdx), "I="+str(gainCurrentIdx), "R="+str(resistorIdx)
+    print("V="+str(gainVoltageIdx), "I="+str(gainCurrentIdx), "R="+str(resistorIdx))
     pass
 
 def adcReadBuffer():
@@ -260,8 +261,8 @@ def adcReadBuffer():
 
     arr1 = array.array('H')
     arr2 = array.array('H')
-    size2 = len(arr)/2
-    for i in xrange(0, size2):
+    size2 = len(arr)//2
+    for i in range(0, size2):
         arr1.append(arr[i])
         arr2.append(arr[i+size2])
 
@@ -298,7 +299,7 @@ def adcSynchro(inPeriod, inAmplitude = None):
         amplitude = inAmplitude
     else:
         amplitude = DEFAULT_DAC_AMPLITUDE
-    dwrite(struct.pack("=BIH", COMMAND_START_SYNCHRO, inPeriod, amplitude))
+    dwrite(struct.pack("=BIH", COMMAND_START_SYNCHRO, inPeriod, amplitude ))
     data = dread()
     #print data
     (period, clock, ncycle) = struct.unpack_from('=III', data, 1)
@@ -310,7 +311,7 @@ def adcRequestData():
     dwrite([COMMAND_REQUEST_DATA]);
     dread()
 
-    for i in xrange(0,50):
+    for i in range(0,50):
         time.sleep(0.01)
         dwrite([COMMAND_DATA_COMPLETE]);
         data = dread()
@@ -319,7 +320,7 @@ def adcRequestData():
             break
 
     if complete!=1:
-        print "complete error = ", complete
+        print("complete error = ", complete)
 
     (out1, out2) = adcReadBuffer()
 
@@ -327,7 +328,7 @@ def adcRequestData():
 
 def setCorrector2x(corrector, period):
 
-    for iresistor in xrange(3):
+    for iresistor in range(3):
         #iresistor == rezistorIdx
         corr = corrector.corr[iresistor]
         #Z1 = corr.Rmin
@@ -364,7 +365,7 @@ def setCorrectorOpen(corrector, period, maxAmplitude):
     data = dread()
     assert(data[0]==COMMAND_SET_CORRECTOR_OPENR)
 
-    for gain_idx in xrange(len(getGainOpenShortIdx())):
+    for gain_idx in range(len(getGainOpenShortIdx())):
         gain_index_I = getGainOpenShortIdx()[gain_idx]
         d = corr.data[gain_index_I][period]
         Zstdm = d['load']['R']
@@ -386,7 +387,7 @@ def setCorrectorShort(corrector, period):
     data = dread()
     assert(data[0]==COMMAND_SET_CORRECTOR_SHORTR)
 
-    for gain_idx in xrange(len(getGainOpenShortIdx())):
+    for gain_idx in range(len(getGainOpenShortIdx())):
         gain_index_I = getGainOpenShortIdx()[gain_idx]
         d = corr.data[gain_index_I][period]
         Zsm = d['short']['R']
@@ -414,14 +415,14 @@ def FlashCorrector(corrector, maxAmplitude):
     dwrite([COMMAND_CORRECTOR_FLASH_CLEAR])
     data = dread()
     assert(data[0]==COMMAND_CORRECTOR_FLASH_CLEAR)
-    print "flash clear code=", data[1]
+    print("flash clear code=", data[1])
 
     for period in HARDWARE_CORRECTOR_PERIODS:
         setCorrector(corrector, period, maxAmplitude)
         dwrite([COMMAND_FLASH_CURRENT_DATA])
         data = dread()
         assert(data[0]==COMMAND_FLASH_CURRENT_DATA)
-        print "flash write code=", data[1]
+        print("flash write code=", data[1])
     pass
 
 def setSerial(ser=True):
@@ -449,7 +450,7 @@ def adcRequestLastCompute():
     dwrite([COMMAND_REQUEST_DATA]);
     dread()
 
-    for i in xrange(0,20):
+    for i in range(0,20):
         time.sleep(0.01)
         dwrite([COMMAND_DATA_COMPLETE]);
         data = dread()
@@ -458,7 +459,7 @@ def adcRequestLastCompute():
             break
 
     if complete!=1:
-        print "complete error = ", complete
+        print("complete error = ", complete)
     #else:
         #print "complete ok"
     return adcLastCompute()
@@ -467,7 +468,7 @@ def adcRequestLastComputeX(count=10):
     data = adcRequestLastCompute()
     dataI = data['summary']['I']
     dataV = data['summary']['V']
-    for i in xrange(1, count):
+    for i in range(1, count):
         d = adcRequestLastCompute()
         dV = d['summary']['V']
         dI = d['summary']['I']
@@ -492,7 +493,7 @@ def adcRequestLastComputeX(count=10):
 def adcRequestLastComputeHardAuto(countComputeX, predefinedResistorIdx=255):
     startGainAuto(countComputeX, predefinedResistorIdx)
 
-    for i in xrange(0,20):
+    for i in range(0,20):
         time.sleep(0.1)
         dwrite([COMMAND_DATA_COMPLETE]);
         data = dread()
@@ -501,9 +502,9 @@ def adcRequestLastComputeHardAuto(countComputeX, predefinedResistorIdx=255):
             break
 
     if complete!=1:
-        print "complete error = ", complete
+        print("complete error = ", complete)
     else:
-        print "complete ok"
+        print("complete ok")
 
     adcReadRVI()    
     return adcLastCompute()
@@ -540,7 +541,7 @@ def setGainAuto(predefinedRes=-1, maxAmplitude=None):
         setResistor(predefinedRes)
     else:
         #ищем резистор начиная с минимальных значений, ибо при перегрузе могут быть странные эффекты
-        for i in xrange(0, len(resistorValues)):
+        for i in range(0, len(resistorValues)):
             setResistor(i)
             jout = adcRequestLastCompute()
             jI = jout['summary']['I']
@@ -609,7 +610,7 @@ def setGainAuto(predefinedRes=-1, maxAmplitude=None):
         imin = jI['min']
         imax = jI['max']
         #print "gainI=", i
-        print " vmin="+str(vmin), " vmax="+str(vmax)
+        print(" vmin="+str(vmin), " vmax="+str(vmax))
         #print " imin="+str(imin)
         #print " imax="+str(imax)
         #print " DV="+str(vmax-vmin)
@@ -629,7 +630,7 @@ def setGainAuto(predefinedRes=-1, maxAmplitude=None):
 
     setSetGain(1, idxV)
     setSetGain(0, idxI)
-    print "gain auto", " V="+str(idxV), "I="+str(idxI), "R="+str(resistorIdx)
+    print("gain auto", " V="+str(idxV), "I="+str(idxI), "R="+str(resistorIdx))
     pass
 
 def adcLastCompute():
@@ -695,17 +696,17 @@ def adcSynchroJson(soft=True, corrector = None, count=10):
         (out1x, out2x) = adcRequestData()
         out1xh = arrByteToShort(out1x)
         out2xh = arrByteToShort(out2x)
-        out1 = [ float(out1xh[i]) for i in xrange(len(out1xh))]
-        out2 = [ float(out2xh[i]) for i in xrange(len(out2xh))]
-        for i in xrange(1, count):
+        out1 = [ float(out1xh[i]) for i in range(len(out1xh))]
+        out2 = [ float(out2xh[i]) for i in range(len(out2xh))]
+        for i in range(1, count):
             (out1x, out2x) = adcRequestData()
             out1xh = arrByteToShort(out1x)
             out2xh = arrByteToShort(out2x)
-            for j in xrange(len(out1)):
+            for j in range(len(out1)):
                 out1[j] += out1xh[j]
                 out2[j] += out2xh[j]
 
-        for j in xrange(len(out1)):
+        for j in range(len(out1)):
             out1[j] /= float(count)
             out2[j] /= float(count)
         jdata["V"] = out1
@@ -738,18 +739,18 @@ def adcSynchroJson(soft=True, corrector = None, count=10):
         data = calculateJson(jout)
         R = data['R']
 
-    print "Rre=", R.real
-    print "Rim=", R.imag
-    print "D={:3.3f} grad".format(cmath.phase(R)*180.0/math.pi)
-    print "ErrV=", jout['summary']['V']['square_error']
-    print "ErrI=", jout['summary']['I']['square_error']
+    print("Rre=", R.real)
+    print("Rim=", R.imag)
+    print("D={:3.3f} grad".format(cmath.phase(R)*180.0/math.pi))
+    print("ErrV=", jout['summary']['V']['square_error'])
+    print("ErrI=", jout['summary']['I']['square_error'])
 
     pass
 
 
 def period10Hz_100Hz():
     arr = []
-    for freq in xrange(10, 100, 10):
+    for freq in range(10, 100, 10):
         period = 72000000/freq
         period = (period/96)*96;
         arr.append(period)
@@ -757,7 +758,7 @@ def period10Hz_100Hz():
 
 def period100Hz_1KHz():
     arr = []
-    for freq in xrange(100, 1000, 20):
+    for freq in range(100, 1000, 20):
         period = 72000000/freq
         period = (period/96)*96;
         arr.append(period)
@@ -765,7 +766,7 @@ def period100Hz_1KHz():
 
 def period1KHz_10KHz():
     arr = []
-    for freq in xrange(1000, 10000, 200):
+    for freq in range(1000, 10000, 200):
         period = 72000000/freq
         period = (period/96)*96;
         arr.append(period)
@@ -773,20 +774,20 @@ def period1KHz_10KHz():
 
 def period10Khz_max():
     arr = []
-    for period in xrange(75*96, 1*96, -96):
+    for period in range(75*96, 1*96, -96):
         arr.append(period)
     return arr
 
 def period10Khz_100KHz():
     arr = []
-    for period in xrange(75*96, 7*96, -96):
+    for period in range(75*96, 7*96, -96):
         arr.append(period)
     return arr
 
 
 def period90Khz_max():
     arr = []
-    for period in xrange(10*96, 2*96, -96):
+    for period in range(10*96, 2*96, -96):
         arr.append(period)
     return arr
 
@@ -797,10 +798,10 @@ def periodAll():
 def allFreq(amplitude=DEFAULT_DAC_AMPLITUDE, resistorIndex=None, VIndex=None, IIndex=None, fileName='freq.json'):
     sc = ScanFreq()
     sc.init(amplitude=amplitude, resistorIndex=resistorIndex, VIndex=VIndex, IIndex=IIndex, fileName=fileName)
-    while sc.next():
-        print "f=", periodToFreqency(period), "p=", period
+    while next(sc):
+        print("f=", periodToFreqency(period), "p=", period)
         pass
-    print "f=", periodToFreqency(period), "p=", period
+    print("f=", periodToFreqency(period), "p=", period)
     sc.save()
     pass
 
@@ -808,7 +809,7 @@ def oneFreq(period, lowPass='auto', inAmplitude = None, maxAmplitude=None, count
     if lowPass=='auto':
         lowPass = (period>=LOW_PASS_PERIOD)
 
-    print "period=", period
+    print("period=", period)
     if count==None:
         if period>=LOW_PASS_PERIOD:
             count = 20
@@ -855,7 +856,7 @@ class ScanFreq:
         return len(self.PERIOD_ROUND)
     def current(self):
         return self.current_value        
-    def next(self):
+    def __next__(self):
         global currentLowPass
 
         possiblePeriod = self.PERIOD_ROUND[self.current_value]
@@ -904,15 +905,15 @@ class ScanFreq:
         f.close()
 
 def printEndpoint(e):
-    print "Endpoint:"
-    print "bLength=", e.bLength
-    print "bDescriptorType=", e.bDescriptorType
-    print "bEndpointAddress=", e.bEndpointAddress
-    print "bmAttributes=", e.bmAttributes
-    print "wMaxPacketSize=", e.wMaxPacketSize
-    print "bInterval=", e.bInterval
-    print "bRefresh=", e.bRefresh
-    print "bSynchAddress=", e.bSynchAddress
+    print("Endpoint:")
+    print("bLength=", e.bLength)
+    print("bDescriptorType=", e.bDescriptorType)
+    print("bEndpointAddress=", e.bEndpointAddress)
+    print("bmAttributes=", e.bmAttributes)
+    print("wMaxPacketSize=", e.wMaxPacketSize)
+    print("bInterval=", e.bInterval)
+    print("bRefresh=", e.bRefresh)
+    print("bSynchAddress=", e.bSynchAddress)
     pass
 
 def initDevice():
@@ -924,9 +925,9 @@ def initDevice():
     dev.reset()
     for cfg in dev:
         for i in cfg:
-            print "interface=", i.bInterfaceNumber
+            print("interface=", i.bInterfaceNumber)
             for e in i:
-                print e.bEndpointAddress
+                print(e.bEndpointAddress)
                 #printEndpoint(e)
 
     #for x in xrange(4):
@@ -969,7 +970,7 @@ def main():
 
         if soft:
             setLowPass(False)
-            if False:
+            if True:
                 setGainAuto()
                 #setGainAuto(predefinedRes=3)
             else:

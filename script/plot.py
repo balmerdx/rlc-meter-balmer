@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 # balmer@inbox.ru 2014 RLC Meter
 import sys, os, csv
-from PyQt5 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui
 import threading
 
 import matplotlib
@@ -9,7 +9,7 @@ import time
 import math
 import cmath
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 import jplot
 import usb_commands
@@ -47,24 +47,24 @@ class FormDrawData(QtGui.QMainWindow):
 		right_vbox = QtGui.QVBoxLayout()
 
 		self.gtype_combo_box = QtGui.QComboBox()
-		self.gtype_combo_box.addItem(u'Re+Im', QtCore.QVariant('ReImCorrect'))
-		self.gtype_combo_box.addItem(u'Re', QtCore.QVariant('ReCorrect'))
-		self.gtype_combo_box.addItem(u'Im', QtCore.QVariant('ImCorrect'))
-		self.gtype_combo_box.addItem(u'C', QtCore.QVariant('C'))
-		self.gtype_combo_box.addItem(u'L', QtCore.QVariant('L'))
-		self.gtype_combo_box.addItem(u'Error', QtCore.QVariant('error'))
-		self.gtype_combo_box.addItem(u'DFI (corrected)', QtCore.QVariant('dfic'))
-		self.gtype_combo_box.addItem(u'DFI (uncorrected)', QtCore.QVariant('dfi'))
-		self.gtype_combo_box.addItem(u'Re+Im (Raw)', QtCore.QVariant('ReImRaw'))
-		self.gtype_combo_box.addItem(u'Amplithude I V', QtCore.QVariant('ampIV'))
+		self.gtype_combo_box.addItem('Re+Im', QtCore.QVariant('ReImCorrect'))
+		self.gtype_combo_box.addItem('Re', QtCore.QVariant('ReCorrect'))
+		self.gtype_combo_box.addItem('Im', QtCore.QVariant('ImCorrect'))
+		self.gtype_combo_box.addItem('C', QtCore.QVariant('C'))
+		self.gtype_combo_box.addItem('L', QtCore.QVariant('L'))
+		self.gtype_combo_box.addItem('Error', QtCore.QVariant('error'))
+		self.gtype_combo_box.addItem('DFI (corrected)', QtCore.QVariant('dfic'))
+		self.gtype_combo_box.addItem('DFI (uncorrected)', QtCore.QVariant('dfi'))
+		self.gtype_combo_box.addItem('Re+Im (Raw)', QtCore.QVariant('ReImRaw'))
+		self.gtype_combo_box.addItem('Amplithude I V', QtCore.QVariant('ampIV'))
 		
 		
 		self.gtype_combo_box.currentIndexChanged.connect(self.OnSelectGraph)
 		right_vbox.addWidget(self.gtype_combo_box)
 
 		self.serial_combo_box = QtGui.QComboBox()
-		self.serial_combo_box.addItem(u'Serial')
-		self.serial_combo_box.addItem(u'Parralel')
+		self.serial_combo_box.addItem('Serial')
+		self.serial_combo_box.addItem('Parralel')
 		self.serial_combo_box.currentIndexChanged.connect(self.OnSerial)
 		right_vbox.addWidget(self.serial_combo_box)
 
@@ -300,21 +300,21 @@ class FormMeasure(QtGui.QMainWindow):
 		self.freq_slider.setRange (0, len(self.periods)-1)
 		vbox.addWidget(self.freq_slider)
 
-		self.freq_label = QtGui.QLabel(u'info');
+		self.freq_label = QtGui.QLabel('info');
 		vbox.addWidget(self.freq_label);
 		self.OnSliderValueChanged(self.freq_slider.value())
 
 
 		self.serial_combo_box = QtGui.QComboBox()
-		self.serial_combo_box.addItem(u'Serial')
-		self.serial_combo_box.addItem(u'Parralel')
+		self.serial_combo_box.addItem('Serial')
+		self.serial_combo_box.addItem('Parralel')
 		self.serial_combo_box.currentIndexChanged.connect(self.OnSerial)
 		vbox.addWidget(self.serial_combo_box)
 
-		self.info_label = QtGui.QLabel(u'info');
+		self.info_label = QtGui.QLabel('info');
 		vbox.addWidget(self.info_label);
 
-		button_close = QtGui.QPushButton(u'Закончить.')
+		button_close = QtGui.QPushButton('Закончить.')
 		button_close.clicked.connect(self.close)
 		vbox.addWidget(button_close)
 
@@ -346,7 +346,7 @@ class FormMeasure(QtGui.QMainWindow):
 		pass
 
 	def closeEvent(self, event):
-		print "closeEvent"
+		print("closeEvent")
 		self.end_thread = True
 		event.accept()
 		pass

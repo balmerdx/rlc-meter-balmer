@@ -75,16 +75,16 @@ def formatL(L):
 	return '{:3.1f} H'.format(L)
 
 def printC(C):
-	print "C=", formatC(C)
+	print("C=", formatC(C))
 
 def readJson(filename):
-	with open(filename, "rb") as file:
+	with open(filename, "r") as file:
 		data = json.load(file)
 	return data
 
 def makeTimeList(readableData, xmin, xstep):
 	xlist = []
-	for i in xrange(0, len(readableData)):
+	for i in range(0, len(readableData)):
 		xlist.append(xmin+i*xstep)
 	return xlist
 
@@ -110,10 +110,10 @@ def timePerSample(jout):
 def averagePeriod(data, ncycle):
 	adata = [0.0]*ncycle
 	num = len(data)/ncycle
-	for i in xrange(0, len(data)):
+	for i in range(0, len(data)):
 		adata[i%ncycle] += data[i]
 
-	for i in xrange(0, ncycle):
+	for i in range(0, ncycle):
 		adata[i] /= num
 	return adata
 
@@ -236,7 +236,7 @@ class CorrectorOpen:
 			rangeI = getGainOpenShortIdx()
 		self.R = {}
 
-		for idx in xrange(len(rangeI)):
+		for idx in range(len(rangeI)):
 			i = rangeI[idx]
 			prefix = 'cor/R'+str(diapazon)+'V0I'+str(i)+'_'
 			fname0 = prefix+name0[idx]+'.json'
@@ -342,7 +342,7 @@ class Corrector:
 		#self.corr.append(Corrector2x(1))
 		#self.corr.append(Corrector2x(2))
 		#self.corr.append(CorrectorOpen(3))
-		for diapazon in xrange(4):
+		for diapazon in range(4):
 			self.corr.append(CorrectorOpen(diapazon))
 		pass
 	def correct(self, R, period, F, attr):
@@ -435,25 +435,25 @@ def calculate(fileName):
 	F = res['F']
 	Rre = res['R'].real
 	Rim = res['R'].imag
-	print "F=", F
-	print "dfi=", cmath.phase(res['R'])
-	print "resistance=", abs(res['R']), "Om"
-	print "Rre=", Rre, "Om"
-	print "Rim=", Rim, "Om"
+	print("F=", F)
+	print("dfi=", cmath.phase(res['R']))
+	print("resistance=", abs(res['R']), "Om")
+	print("Rre=", Rre, "Om")
+	print("Rim=", Rim, "Om")
 
 	if Rim<0:
 		# capacitor
 		Rim = -Rim
 		C = 1/(2*math.pi*F*Rim)
-		print "ESR=", Rre, " Om"
+		print("ESR=", Rre, " Om")
 		printC(C)
 		pass
 	else:
 		# inductance
 		L = Rim/(2*math.pi*F)
-		print "R=", Rre, " Om"
+		print("R=", Rre, " Om")
 		#print "L=", L*1e6-0.137, " mkH"
-		print "L=", L*1e6, " mkH"
+		print("L=", L*1e6, " mkH")
 		pass
 
 	return 'data' in jout
@@ -508,7 +508,7 @@ def plotRawInternal(ydata, ncycle, color, average, ax, dx, error, result):
 		csin = result["csin"]
 		ccos = result["ccos"]
 		c0 = result["c0"]
-		for i in xrange(len(timeList)):
+		for i in range(len(timeList)):
 			fi = 2*math.pi*i/ncycle
 			v = math.sin(fi)*csin+math.cos(fi)*ccos+c0
 			ydata[i] -= v
@@ -525,10 +525,10 @@ def plotRaw(fileName, IV, average = False, error=False):
 	ncycle = jattr['ncycle']
 
 	(resultV, resultI) = calculateSinCos(jout)
-	print 'resultV=', resultV
-	print 'resultI=', resultI
-	print 'dfi=', (resultV['fi']-resultI['fi'])*180/math.pi, 'grad'
-	print 'ncycle=', ncycle
+	print('resultV=', resultV)
+	print('resultI=', resultI)
+	print('dfi=', (resultV['fi']-resultI['fi'])*180/math.pi, 'grad')
+	print('ncycle=', ncycle)
 
 
 	ax.set_xlabel("Time")
@@ -567,14 +567,14 @@ def plotFftInternal(ydata, ncycle, color, average, ax, dx, result):
 	csin = result["csin"]
 	ccos = result["ccos"]
 	c0 = result["c0"]
-	for i in xrange(len(ydata)):
+	for i in range(len(ydata)):
 		fi = 2*math.pi*i/ncycle
 		ydata[i] -= c0
 
 	#yfft = np.fft.fft(ydata)
 	yfft = fftNormalize(ydata)
 	yfft = abs(yfft)
-	for i in xrange(len(yfft)):
+	for i in range(len(yfft)):
 		if yfft[i]<1e-10:
 			yfft[i] = 1e-10
 	yfft = 20*np.log10(yfft)
@@ -592,8 +592,8 @@ def plotFft(fileName, IV, average = False):
 	ncycle = jattr['ncycle']
 
 	(resultV, resultI) = calculateSinCos(jout)
-	print 'resultV=', resultV
-	print 'resultI=', resultI	
+	print('resultV=', resultV)
+	print('resultI=', resultI)	
 
 
 	ax.set_xlabel("Hz")

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 # balmer@inbox.ru 2014 RLC Meter
 import sys, os, csv
-from PyQt5 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui
 
 import matplotlib
 import time
@@ -30,27 +30,27 @@ class FormMain(QtGui.QMainWindow):
         self.main_frame = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout()
 
-        header_label = QtGui.QLabel(u'Измеритель комплексного сопротивления')
+        header_label = QtGui.QLabel('Измеритель комплексного сопротивления')
 
         vbox.addWidget(header_label)
 
-        scan_button = QtGui.QPushButton(u'Просканировать диапазон')
+        scan_button = QtGui.QPushButton('Просканировать диапазон')
         scan_button.clicked.connect(self.OnScan)
         vbox.addWidget(scan_button)
 
-        scan_button = QtGui.QPushButton(u'Измерить')
+        scan_button = QtGui.QPushButton('Измерить')
         scan_button.clicked.connect(self.OnMeasure)
         vbox.addWidget(scan_button)
 
-        graph_button = QtGui.QPushButton(u'Просмотреть последний график')
+        graph_button = QtGui.QPushButton('Просмотреть последний график')
         graph_button.clicked.connect(self.OnGraph)
         vbox.addWidget(graph_button)
 
-        graph_button = QtGui.QPushButton(u'Просмотреть график...')
+        graph_button = QtGui.QPushButton('Просмотреть график...')
         graph_button.clicked.connect(self.OnGraphOpen)
         vbox.addWidget(graph_button)
 
-        cal_button = QtGui.QPushButton(u'Калибровка')
+        cal_button = QtGui.QPushButton('Калибровка')
         cal_button.clicked.connect(self.OnCalibration)
         vbox.addWidget(cal_button)
 
@@ -60,7 +60,7 @@ class FormMain(QtGui.QMainWindow):
 
     def initDevice(self):
         if not usb_commands.initDevice():
-            QtGui.QMessageBox.about(self, TITLE, u"Устройство не найдено.")
+            QtGui.QMessageBox.about(self, TITLE, "Устройство не найдено.")
             return False
         return True
 
@@ -118,6 +118,10 @@ class FormScan(QtGui.QMainWindow):
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.end_thread = False
 
+        dir = "cor"
+        if not os.path.isdir(dir):
+            print("mkdir=", os.mkdir(dir))
+            
         self.setWindowTitle(TITLE)
         self.CreateMainFrame()
         self.maxAmplitude = None
@@ -161,17 +165,17 @@ class FormScan(QtGui.QMainWindow):
         self.main_frame = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout()
 
-        self.header_label = QtGui.QLabel(u'Сканирование диапазона.')
+        self.header_label = QtGui.QLabel('Сканирование диапазона.')
         vbox.addWidget(self.header_label)
 
         self.progress_bar = QtGui.QProgressBar()
 
         vbox.addWidget(self.progress_bar)
 
-        self.info_label = QtGui.QLabel(u'info');
+        self.info_label = QtGui.QLabel('info');
         vbox.addWidget(self.info_label);
 
-        button_close = QtGui.QPushButton(u'Отменить.')
+        button_close = QtGui.QPushButton('Отменить.')
         button_close.clicked.connect(self.close)
         vbox.addWidget(button_close)
 
@@ -191,7 +195,7 @@ class FormScan(QtGui.QMainWindow):
     @staticmethod
     def UsbThread(self_ptr):
         s = self_ptr
-        while s.scan_freq.next():
+        while next(s.scan_freq):
             if s.end_thread:
                 return
             s.SetInfo()
@@ -216,10 +220,10 @@ class FormScan(QtGui.QMainWindow):
             IIndex=resistorData['IIndex']
             div = resistorData['div']
 
-            amplitude = usb_commands.DEFAULT_DAC_AMPLITUDE / div
+            amplitude = usb_commands.DEFAULT_DAC_AMPLITUDE // div
 
-            print "resistorIndex="+str(resistorData['resistorIndex']),
-            print "VIndex="+str(VIndex), "IIndex="+str(IIndex), "amplitude="+str(amplitude)
+            print("resistorIndex="+str(resistorData['resistorIndex']))
+            print("VIndex="+str(VIndex), "IIndex="+str(IIndex), "amplitude="+str(amplitude))
 
             s.scan_freq.init(resistorIndex=resistorData['resistorIndex'],
                             VIndex=VIndex, IIndex=IIndex,
@@ -229,7 +233,7 @@ class FormScan(QtGui.QMainWindow):
             s.progress_bar.setRange(0, s.scan_freq.count())
             s.progress_bar.setValue(0)
 
-            while s.scan_freq.next():
+            while next(s.scan_freq):
                 if s.end_thread:
                     return
                 s.SetInfo()
@@ -283,15 +287,15 @@ class FormCalibrationResistor(QtGui.QMainWindow):
         self.main_frame = QtGui.QWidget()
         vbox = QtGui.QVBoxLayout()
 
-        header_label = QtGui.QLabel(u'Калибровка')
+        header_label = QtGui.QLabel('Калибровка')
 
         vbox.addWidget(header_label)
 
-        self.AddLine(vbox, u'1 Ом', '1Om', 1.0, [
+        self.AddLine(vbox, '1 Ом', '1Om', 1.0, [
             {'resistorIndex': 0, 'VIndex':7, 'IIndex':0, 'div': 1},
             ])
 
-        self.AddLine(vbox, u'100 Ом', '100Om', 1e2, [
+        self.AddLine(vbox, '100 Ом', '100Om', 1e2, [
             {'resistorIndex': 0, 'VIndex':0, 'IIndex':0, 'div': 1},
             {'resistorIndex': 0, 'VIndex':0, 'IIndex':1, 'div': 2},
             #{'resistorIndex': 0, 'VIndex':0, 'IIndex':2, 'div': 4},
@@ -303,7 +307,7 @@ class FormCalibrationResistor(QtGui.QMainWindow):
             #{'resistorIndex': 0, 'VIndex':7, 'IIndex':0, 'div': 32},
             ])
 
-        self.AddLine(vbox, u'1 KОм', '1KOm', 1e3, [
+        self.AddLine(vbox, '1 KОм', '1KOm', 1e3, [
             #{'resistorIndex': 0, 'VIndex':0, 'IIndex':0, 'div': 1},
             #{'resistorIndex': 0, 'VIndex':0, 'IIndex':1, 'div': 1},
             {'resistorIndex': 0, 'VIndex':0, 'IIndex':2, 'div': 1},
@@ -313,7 +317,7 @@ class FormCalibrationResistor(QtGui.QMainWindow):
             #{'resistorIndex': 1, 'VIndex':0, 'IIndex':2, 'div': 4},
             ])
 
-        self.AddLine(vbox, u'10 KОм', '10KOm', 1e4, [
+        self.AddLine(vbox, '10 KОм', '10KOm', 1e4, [
             #{'resistorIndex': 1, 'VIndex':0, 'IIndex':0, 'div': 1},
             #{'resistorIndex': 1, 'VIndex':0, 'IIndex':1, 'div': 1},
             {'resistorIndex': 1, 'VIndex':0, 'IIndex':2, 'div': 1},
@@ -323,7 +327,7 @@ class FormCalibrationResistor(QtGui.QMainWindow):
             #{'resistorIndex': 2, 'VIndex':0, 'IIndex':2, 'div': 4},
             ])
 
-        self.AddLine(vbox, u'100 KОм', '100KOm', 1e5, [
+        self.AddLine(vbox, '100 KОм', '100KOm', 1e5, [
             #{'resistorIndex': 2, 'VIndex':0, 'IIndex':0, 'div': 1},
             #{'resistorIndex': 2, 'VIndex':0, 'IIndex':1, 'div': 1},
             {'resistorIndex': 2, 'VIndex':0, 'IIndex':2, 'div': 1},
@@ -367,12 +371,12 @@ class FormCalibrationResistor(QtGui.QMainWindow):
 
             ])
 
-        button_close = QtGui.QPushButton(u'Записать в FLASH')
+        button_close = QtGui.QPushButton('Записать в FLASH')
         button_close.clicked.connect(self.OnWriteFlash)
         vbox.addWidget(button_close)
 
 
-        button_close = QtGui.QPushButton(u'Закрыть')
+        button_close = QtGui.QPushButton('Закрыть')
         button_close.clicked.connect(self.close)
         vbox.addWidget(button_close)
 
@@ -384,7 +388,7 @@ class FormCalibrationResistor(QtGui.QMainWindow):
         line = { 'data': data, 'name': nameShort }
         hbox = QtGui.QHBoxLayout()
 
-        label1 = QtGui.QLabel(u'Точное значение сопротивления ' + name + '=')
+        label1 = QtGui.QLabel('Точное значение сопротивления ' + name + '=')
         hbox.addWidget(label1)
         edit = QtGui.QLineEdit()
         #validator = QtGui.QDoubleValidator()
@@ -399,7 +403,7 @@ class FormCalibrationResistor(QtGui.QMainWindow):
         button.clicked.connect(lambda: self.process(line) )
         hbox.addWidget(button)
 
-        label = QtGui.QLabel(u'Не пройден')
+        label = QtGui.QLabel('Не пройден')
         line['label'] = label
         label.setStyleSheet("QLabel { color : red; }");
         hbox.addWidget(label)
@@ -409,16 +413,16 @@ class FormCalibrationResistor(QtGui.QMainWindow):
         pass
 
     def AddLineShort(self, vbox, data):
-        title = u'Замкнутые щупы'
+        title = 'Замкнутые щупы'
         name = 'short'
         line = { 'data': data, 'name': name }        
         hbox = QtGui.QHBoxLayout()
         label1 = QtGui.QLabel(title)
         hbox.addWidget(label1)
-        button = QtGui.QPushButton(u'Пуск.')
+        button = QtGui.QPushButton('Пуск.')
         button.clicked.connect(lambda: self.processShort(line))
         hbox.addWidget(button)
-        label = QtGui.QLabel(u'XXX')
+        label = QtGui.QLabel('XXX')
         line['label'] = label
         hbox.addWidget(label)
         vbox.addLayout(hbox)
@@ -427,18 +431,18 @@ class FormCalibrationResistor(QtGui.QMainWindow):
         pass
 
     def AddLineOpen(self, vbox, data):
-        title = u'Открытые щупы'
+        title = 'Открытые щупы'
         name = 'open'
         line = { 'data': data, 'name': name }        
         hbox = QtGui.QHBoxLayout()
         label1 = QtGui.QLabel(title)
         hbox.addWidget(label1)
-        button = QtGui.QPushButton(u'Пуск.')
+        button = QtGui.QPushButton('Пуск.')
         button.clicked.connect(lambda: self.processOpen(line))
         #button.clicked.connect(lambda: self.OnCompleteOpenPass(line))
         
         hbox.addWidget(button)
-        label = QtGui.QLabel(u'XXX')
+        label = QtGui.QLabel('XXX')
         line['label'] = label
         hbox.addWidget(label)
         vbox.addLayout(hbox)
@@ -484,15 +488,15 @@ class FormCalibrationResistor(QtGui.QMainWindow):
         corrector = jplot.Corrector()
         maxAmplitude = jplot.MaxAmplitude()
         usb_commands.FlashCorrector(corrector, maxAmplitude)
-        QtGui.QMessageBox.about(self, TITLE, u"Запись корректирующих коэффициэнтов окончена.")
+        QtGui.QMessageBox.about(self, TITLE, "Запись корректирующих коэффициэнтов окончена.")
         pass
 
     def setComplete(self, label, ok):
         if ok:
-            label.setText(u"Пройден.")
+            label.setText("Пройден.")
             label.setStyleSheet("QLabel { color : green; }");
         else:
-            label.setText(u'Не пройден')
+            label.setText('Не пройден')
             label.setStyleSheet("QLabel { color : red; }");
         pass
 
