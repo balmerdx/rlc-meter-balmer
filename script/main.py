@@ -129,6 +129,21 @@ class FormScan(QtGui.QMainWindow):
         self.signalComplete.connect(self.ThClose)
         pass
 
+    def generatorQuant(self):
+        ok = next(self.generator, False)
+        if not ok:
+            self.timer.stop()
+            self.signalComplete.emit()
+        pass
+
+    def generatorStart(self, gen):
+        self.generator = gen
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.generatorQuant)
+        self.timer.start(100)
+        pass
+
+
     def startDefault(self, filename='freq.json'):
         self.scan_freq = usb_commands.ScanFreq()
         self.scan_freq.init(fileName=filename)
@@ -136,8 +151,7 @@ class FormScan(QtGui.QMainWindow):
         self.progress_bar.setRange(0, self.scan_freq.count())
         self.progress_bar.setValue(0)
 
-        self.th = threading.Thread(target=FormScan.UsbThread, args=[self])
-        self.th.start()
+        self.generatorStart(self.UsbThread())
         pass
 
     def startCalibrateR(self, R, resistorData, Rname):
@@ -153,8 +167,7 @@ class FormScan(QtGui.QMainWindow):
             ]
         Rindex - индекс резистора для getCorrName
         '''
-        self.th = threading.Thread(target=FormScan.CalibrateThreadR, args=[self, R, resistorData, Rname])
-        self.th.start()
+        self.generatorStart(self.CalibrateThreadR(R, resistorData, Rname))
         pass
 
     def setMaxAmplitude(self, maxAmplitude):
@@ -192,29 +205,23 @@ class FormScan(QtGui.QMainWindow):
         event.accept()
         pass
 
-    @staticmethod
-    def UsbThread(self_ptr):
-        s = self_ptr
-        while next(s.scan_freq):
-            if s.end_thread:
+    def UsbThread(self):
+        while next(self.scan_freq):
+            if self.end_thread:
                 return
-            s.SetInfo()
-            pass
+            self.SetInfo()
+            yield True
 
-        s.SetInfo()
-        s.scan_freq.save()
-        #s.close()
-        s.signalComplete.emit()
+        self.SetInfo()
+        self.scan_freq.save()
         pass
 
-    @staticmethod
-    def CalibrateThreadR(self_ptr, R, resistorDatas, Rname):
-        s = self_ptr
+    def CalibrateThreadR(self, R, resistorDatas, Rname):
 
         for resistorData in resistorDatas:            
             fileName = getCorrName(resistorData, Rname)
-            s.header_label.setText(fileName)
-            s.scan_freq = usb_commands.ScanFreq()
+            self.header_label.setText(fileName)
+            self.scan_freq = usb_commands.ScanFreq()
 
             VIndex=resistorData['VIndex']
             IIndex=resistorData['IIndex']
@@ -225,26 +232,24 @@ class FormScan(QtGui.QMainWindow):
             print("resistorIndex="+str(resistorData['resistorIndex']))
             print("VIndex="+str(VIndex), "IIndex="+str(IIndex), "amplitude="+str(amplitude))
 
-            s.scan_freq.init(resistorIndex=resistorData['resistorIndex'],
+            self.scan_freq.init(resistorIndex=resistorData['resistorIndex'],
                             VIndex=VIndex, IIndex=IIndex,
                             amplitude=amplitude, fileName=fileName,
-                            maxAmplitude=s.maxAmplitude)
+                            maxAmplitude=self.maxAmplitude)
 
-            s.progress_bar.setRange(0, s.scan_freq.count())
-            s.progress_bar.setValue(0)
+            self.progress_bar.setRange(0, self.scan_freq.count())
+            self.progress_bar.setValue(0)
 
-            while next(s.scan_freq):
-                if s.end_thread:
+            while next(self.scan_freq):
+                if self.end_thread:
                     return
-                s.SetInfo()
-                pass
+                self.SetInfo()
+                yield True
 
-            s.SetInfo()
-            s.scan_freq.jout['R'] = R
-            s.scan_freq.save()
+            self.SetInfo()
+            self.scan_freq.jout['R'] = R
+            self.scan_freq.save()
 
-        #s.close()
-        s.signalComplete.emit()
         pass
 
     def SetInfo(self):

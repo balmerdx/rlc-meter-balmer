@@ -47,16 +47,16 @@ class FormDrawData(QtGui.QMainWindow):
 		right_vbox = QtGui.QVBoxLayout()
 
 		self.gtype_combo_box = QtGui.QComboBox()
-		self.gtype_combo_box.addItem('Re+Im', QtCore.QVariant('ReImCorrect'))
-		self.gtype_combo_box.addItem('Re', QtCore.QVariant('ReCorrect'))
-		self.gtype_combo_box.addItem('Im', QtCore.QVariant('ImCorrect'))
-		self.gtype_combo_box.addItem('C', QtCore.QVariant('C'))
-		self.gtype_combo_box.addItem('L', QtCore.QVariant('L'))
-		self.gtype_combo_box.addItem('Error', QtCore.QVariant('error'))
-		self.gtype_combo_box.addItem('DFI (corrected)', QtCore.QVariant('dfic'))
-		self.gtype_combo_box.addItem('DFI (uncorrected)', QtCore.QVariant('dfi'))
-		self.gtype_combo_box.addItem('Re+Im (Raw)', QtCore.QVariant('ReImRaw'))
-		self.gtype_combo_box.addItem('Amplithude I V', QtCore.QVariant('ampIV'))
+		self.gtype_combo_box.addItem('Re+Im', 'ReImCorrect')
+		self.gtype_combo_box.addItem('Re', 'ReCorrect')
+		self.gtype_combo_box.addItem('Im', 'ImCorrect')
+		self.gtype_combo_box.addItem('C', 'C')
+		self.gtype_combo_box.addItem('L', 'L')
+		self.gtype_combo_box.addItem('Error', 'error')
+		self.gtype_combo_box.addItem('DFI (corrected)', 'dfic')
+		self.gtype_combo_box.addItem('DFI (uncorrected)', 'dfi')
+		self.gtype_combo_box.addItem('Re+Im (Raw)', 'ReImRaw')
+		self.gtype_combo_box.addItem('Amplithude I V', 'ampIV')
 		
 		
 		self.gtype_combo_box.currentIndexChanged.connect(self.OnSelectGraph)
@@ -96,7 +96,7 @@ class FormDrawData(QtGui.QMainWindow):
 		pass
 
 	def OnSelectGraph(self, index):
-		self.gtype = self.gtype_combo_box.itemData(index).toString()
+		self.gtype = self.gtype_combo_box.itemData(index)
 		self.updateFigure(self.filename)
 		pass
 
