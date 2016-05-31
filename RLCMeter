@@ -954,3 +954,19 @@ ESR KOm		0.800 		10.86 		349 		1.50 		1.20 		13.0        --- 		---
 	OnResistorIndex
 
 - попробовать отключить внутренний буфер на выходе DAC
+
+-
+	Посмотреть информацию об устройстве.
+	lsusb -v -d 16c0:05dc
+
+	http://ubuntuforums.org/showthread.php?t=901891
+	
+	Создали файл
+ 	/etc/udev/rules.d/40-basic-permissions.rules
+ 	вписали в него
+ 	SUBSYSTEM=="usb", MODE="0666", GROUP="dialout"
+ 	Теперь у меня есть польный доступ к USB устройствам.
+
+
+
+

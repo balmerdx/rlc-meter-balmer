@@ -335,14 +335,14 @@ class FormMeasure(QtGui.QMainWindow):
 
 	def OnSliderValueChanged (self, index):
 		self.freq_slider.setValue(index)
-		period = self.periods[index]
-		F = usb_commands.periodToFreqency(period)
+		self.period = self.periods[index]
+		F = usb_commands.periodToFreqency(self.period)
 		self.freq_label.setText(str(int(F))+' Hz');
 		pass
 
 	def OnSliderReleased(self):
-		index = self.freq_slider.value()
-		self.period = self.periods[index]
+		#index = self.freq_slider.value()
+		#self.period = self.periods[index]
 		pass
 
 	def closeEvent(self, event):
