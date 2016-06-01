@@ -276,14 +276,14 @@ class FormMeasure(QtGui.QMainWindow):
 		super(FormMeasure, self).__init__(parent)
 		self.setWindowTitle(title)
 		self.serial = True
-		self.end_thread = False
 		self.createMainFrame()
 
 		self.corr = jplot.Corrector()
 		self.maxAmplitude = jplot.MaxAmplitude()
 
-		self.th = threading.Thread(target=self.UsbThread)
-		self.th.start()
+		self.timer = QtCore.QTimer()
+		self.timer.timeout.connect(self.UsbQuant)
+		self.timer.start(100)
 		pass
 
 	def createMainFrame(self):
@@ -347,23 +347,19 @@ class FormMeasure(QtGui.QMainWindow):
 
 	def closeEvent(self, event):
 		print("closeEvent")
-		self.end_thread = True
+		self.timer.stop()
 		event.accept()
 		pass
 
-	def UsbThread(self):
-		i = 0
-		while not self.end_thread:
-			jf = usb_commands.oneFreq(self.period, maxAmplitude=self.maxAmplitude)
-			if self.corr:
-				res = self.corr.calculateJson(jf)
-			else:
-				res = jplot.calculateJson(jf)
-				res['Zx'] = res['R']
+	def UsbQuant(self):
+		jf = usb_commands.oneFreq(self.period, maxAmplitude=self.maxAmplitude)
+		if self.corr:
+			res = self.corr.calculateJson(jf)
+		else:
+			res = jplot.calculateJson(jf)
+			res['Zx'] = res['R']
 
-			if self.end_thread:
-				return
-			self.SetInfo(res)
+		self.SetInfo(res)
 		pass
 
 	def SetInfo(self, res):
